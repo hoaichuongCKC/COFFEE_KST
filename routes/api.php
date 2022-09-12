@@ -16,12 +16,16 @@ use App\Http\Controllers\Api\Auth\AuthController;
 
 
 
-Route::group(['prefix' => 'v2/AuthController'], function () {
+Route::group(['prefix' => 'v2/auth_controller'], function () {
 
-    Route::post('/Login',[AuthController::class,'login']);
+    Route::post('/login',[AuthController::class,'login']);
     
     Route::post('/change_password',[AuthController::class,'changePassword']);
 
     Route::post('/get_information_user',[AuthController::class,'getInformationUser']);
+
+    Route::post('/reset_password',[AuthController::class,'resetPassword']);
+
+    Route::post('/create_new_account',[AuthController::class,'createNewAccount']);
 
 });

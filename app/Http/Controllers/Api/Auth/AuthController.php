@@ -180,7 +180,7 @@ class AuthController extends Controller
             return  response()->json([
                 "id" => null,
                 "results"=> $result,
-            ],200);
+            ],404);
         }
 
         $user = DB::table('users')->get();
@@ -214,6 +214,104 @@ class AuthController extends Controller
 
     //put new password for user when they are forgot current password
     public function resetPassword(Request $request){
+        //check params null
+        if(empty($request->params["token"]) || empty($request->params["new_password"])){
+            //token is null
+            $result = [
+                "code" => 404,
+                "message" => "Params invalid!",
+                "data" => [],
+            ];
+            return  response()->json([
+                "id" => null,
+                "results"=> $result,
+            ],404);
+        }
         
+        //If params is not null and handle reset password for user.
+        DB::table('users')
+        ->where('token',$request->params["token"])
+        ->update([
+            'password' => Hash::make($request->params["new_password"])
+        ]);
+        
+        //message and result
+        $message = "Tạo mật khẩu mới thành công!";
+
+        $result = [
+            "code" => 200,
+            "message" => $message,
+            "data" => [],
+        ];
+        return  response()->json([
+            "id" => null,
+            "results"=> $result,
+        ],200);
+    }
+
+    public function createNewAccount(Request $request){
+        //avaribles global
+        $reFullname = $request->params["fullname"];
+        $rePhone = $request->params["phone"];
+        $reGender = $request->params["gender"];
+        $reAddressName = $request->params["address_name"];
+        $rePassword = $request->params["password"];
+
+        //check params send request up to server
+
+        if(empty($reFullname) || empty($rePhone) || empty ($reGender) || empty($reAddressName)){
+            $result = [
+                "code" => 404,
+                "message" => "Params invalid!",
+                "data" => [],
+            ];
+            return  response()->json([
+                "id" => null,
+                "results"=> $result,
+            ],404);
+        }
+
+        //check phone exist in my database
+        //If phone exist then return result phone existed.
+
+        $isPhone = DB::table('users')
+        ->where('phone',$rePhone)
+        ->exists();
+        
+        if($isPhone){
+            $message =  "Số điện thoại đã được đăng ký!!";
+
+            $result = [
+                "code" => 200,
+                "message" => $message,
+                "data" => [],
+            ];
+            return  response()->json([
+                "id" => null,
+                "results"=> $result,
+            ],200);
+        }
+
+        //params not invalid.
+        //Create New Account for User.
+        DB::table('users')
+        ->insert([
+            'fullname'=> $reFullname,
+            'phone'=> $rePhone,
+            'address_name'=> $reAddressName,
+            'gender'=> $reGender,
+            'password'=> Hash::make($rePassword),
+        ]);
+
+        $result = [
+            "code" => 200,
+            "message" => "Tạo tài khoản thành công",
+            "data" => [],
+        ];
+
+        return  response()->json([
+            "id" => null,
+            "results"=> $result,
+        ],200);
     }
 }
