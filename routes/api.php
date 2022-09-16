@@ -28,4 +28,7 @@ Route::group(['prefix' => 'v2/auth_controller'], function () {
 
     Route::post('/create_new_account',[AuthController::class,'createNewAccount']);
 
+    Route::post('/has_check_account',[AuthController::class,'hasCheckAccount']);
+
+
 });

@@ -12,6 +12,20 @@ class AuthController extends Controller
 {
     //login api
     public function login(Request $request){
+
+        //If data empty return failed params
+        if(empty($request->params["phone"]) || empty($request->params["password"]) ){
+            $result = [
+                "code" => 404,
+                "message" => "Vui lòng nhập đủ thông tin!",
+                "validate_token" => true,
+                "data" => [],
+            ];
+            return  response()->json([
+                "id" => null,
+                "results"=> $result,
+            ],200);
+        }
         //If check success then return results success
         if (Auth::guard('user')->attempt([
             'phone' => $request->params["phone"],
@@ -79,19 +93,6 @@ class AuthController extends Controller
                 "results"=> $result,
             ],200);
         }
-
-
-        //If data empty return failed params
-        $result = [
-            "code" => 404,
-            "message" => "Tham số không được Null",
-            "validate_token" => true,
-            "data" => [],
-        ];
-        return  response()->json([
-            "id" => null,
-            "results"=> $result,
-        ],200);
     }
     
     //change password for user
@@ -313,5 +314,52 @@ class AuthController extends Controller
             "id" => null,
             "results"=> $result,
         ],200);
+    }
+
+
+    public function hasCheckAccount(Request $request){
+        //check params if params is null
+        $phone = $request->params["phone"];
+        if(empty($phone)){
+            $result = [
+                "code" => 404,
+                "message" => "Params invalid!",
+                "data" => [],
+            ];
+            return  response()->json([
+                "id" => null,
+                "results"=> $result,
+            ],404);
+        }
+        
+        //check phone in DB
+        $isCheckPhone = DB::table('users')
+        ->where('phone',$phone)
+        ->exists();
+
+        if($isCheckPhone){
+
+            $result = [
+                "code" => 200,
+                "message" => "",
+                "data" => [],
+            ];
+            return  response()->json([
+                "id" => null,
+                "results"=> $result,
+            ],200);
+
+        }else{
+
+            $result = [
+                "code" => 201,
+                "message" => "",
+                "data" => [],
+            ];
+            return  response()->json([
+                "id" => null,
+                "results"=> $result,
+            ],200);
+        }
     }
 }
